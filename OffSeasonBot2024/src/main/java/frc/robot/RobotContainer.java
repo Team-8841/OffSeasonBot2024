@@ -12,10 +12,14 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
@@ -30,8 +34,9 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                                                                         "swerve/neo"));
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/"));
+  private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final ShooterSubsystem shooter = new ShooterSubsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -101,13 +106,41 @@ public class RobotContainer
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-    driverXbox.b().whileTrue(
-        Commands.deferredProxy(() -> drivebase.driveToPose(
-                                   new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-                              ));
-    driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+    //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+
+
+    driverXbox.x().whileTrue(new RunCommand( () -> {
+      intake.SensorControl(true, false);
+    })).onFalse(new InstantCommand( () -> {
+      intake.SensorControl(false, false);
+    }));
+
+    driverXbox.a().whileTrue(new InstantCommand( ()-> {
+      intake.SensorControl(false, true);
+    })).onFalse(new InstantCommand( () -> {
+      intake.SensorControl(false, false);
+    }));
+
+    driverXbox.leftBumper().whileTrue(new RunCommand( () -> {
+      intake.setIndexSpeed(1);
+    })).onFalse(new InstantCommand( () -> {
+      intake.setIndexSpeed(0);
+    }));
+
+    driverXbox.rightBumper().onTrue(new InstantCommand( () -> {
+      shooter.setShooterTargetSpeed(4500);
+    }));
+
+    driverXbox.b().onTrue(new InstantCommand(() -> {
+      shooter.setShooterTargetSpeed(0);
+    }));
+
+    //driverXbox.b().whileTrue(
+    //    Commands.deferredProxy(() -> drivebase.driveToPose(
+    //                               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+    //                          ));
+    //driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
     // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
   }
 
