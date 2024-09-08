@@ -3,7 +3,7 @@
       "front": 8.875,
       "left": 8.875
     },
-    "absoluteEncoderOffset": 196.3,
+    "absoluteEncoderOffset": -196.3,
     "drive": {
       "type": "talonfx",
       "id": 1,

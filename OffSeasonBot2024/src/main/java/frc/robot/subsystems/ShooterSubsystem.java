@@ -15,6 +15,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private CANSparkMax m_shooter = new CANSparkMax(15, MotorType.kBrushless);
     private CANSparkMax m_follower = new CANSparkMax(16, MotorType.kBrushless);
 
+    private CANSparkMax m_lift = new CANSparkMax(17, MotorType.kBrushless);
+
     private SparkPIDController m_shooterPID;
     private final RelativeEncoder m_encoder;
     private double m_kP = 0.000240;
@@ -29,6 +31,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         configureSparkMax(m_shooter, IdleMode.kCoast, 40);
         configureSparkMax(m_follower, IdleMode.kCoast, 40);
+
+        configureSparkMax(m_lift, IdleMode.kBrake, 40);
 
         m_shooter.setInverted(true);
         m_follower.setInverted(false);
@@ -66,6 +70,10 @@ public class ShooterSubsystem extends SubsystemBase {
     public boolean upToSpeed() {
         double curVel = m_encoder.getVelocity();
         return curVel > m_setPoint - m_allowedError;
+    }
+
+    public void setLift(double speed){
+        m_lift.set(speed);
     }
  
     public void updateStatus() {

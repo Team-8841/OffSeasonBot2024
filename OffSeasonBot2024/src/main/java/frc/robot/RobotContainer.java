@@ -136,6 +136,19 @@ public class RobotContainer
       shooter.setShooterTargetSpeed(0);
     }));
 
+    driverXbox.povUp().whileTrue(new RunCommand(() -> {
+      shooter.setLift(0.2);
+    })).onFalse(new InstantCommand(() -> {
+      shooter.setLift(0);
+    }));
+
+    driverXbox.povDown().whileTrue(new RunCommand(() -> {
+      shooter.setLift(-0.2);
+    })).onFalse(new InstantCommand( () -> {
+      shooter.setLift(0);
+    }));
+
+
     //driverXbox.b().whileTrue(
     //    Commands.deferredProxy(() -> drivebase.driveToPose(
     //                               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
