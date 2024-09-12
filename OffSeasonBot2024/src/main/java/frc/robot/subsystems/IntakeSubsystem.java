@@ -1,35 +1,41 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+//import com.revrobotics.CANSparkMax;
+//import com.revrobotics.CANSparkBase.IdleMode;
+//import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    private CANSparkMax m_intake = new CANSparkMax(13, MotorType.kBrushed);
-    private CANSparkMax m_index = new CANSparkMax(14, MotorType.kBrushed);
+    //private CANSparkMax m_intake = new CANSparkMax(13, MotorType.kBrushed);
+    //private CANSparkMax m_index = new CANSparkMax(14, MotorType.kBrushed);
+
+
+    private PWMSparkMax m_intake = new PWMSparkMax(0);
+    private PWMSparkMax m_index = new PWMSparkMax(1);
+
+
 
     private DigitalInput m_intakeSensor = new DigitalInput(0);
     private DigitalInput m_indexSensor = new DigitalInput(2);
 
     public IntakeSubsystem() {
-        configureSparkMax(m_intake, IdleMode.kCoast, 40);
-        configureSparkMax(m_index, IdleMode.kCoast, 40);
+        //configureSparkMax(m_intake, IdleMode.kCoast, 40);
+        //configureSparkMax(m_index, IdleMode.kCoast, 40);
 
         m_intake.setInverted(false);
         m_index.setInverted(false);
     }
     
 
-    private void configureSparkMax(CANSparkMax spark, IdleMode idleMode, int currentLimit) {
-        spark.restoreFactoryDefaults();
-        spark.setSmartCurrentLimit(currentLimit);
-        spark.setIdleMode(idleMode);
-    }
+    //private void configureSparkMax(CANSparkMax spark, IdleMode idleMode, int currentLimit) {
+    //spark.restoreFactoryDefaults();
+    //spark.setSmartCurrentLimit(currentLimit);
+    //    spark.setIdleMode(idleMode);
+    //}
 
 
     public void setIntakeSpeed(double speed){
