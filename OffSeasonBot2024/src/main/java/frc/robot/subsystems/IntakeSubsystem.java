@@ -5,7 +5,9 @@ package frc.robot.subsystems;
 //import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -14,8 +16,8 @@ public class IntakeSubsystem extends SubsystemBase {
     //private CANSparkMax m_index = new CANSparkMax(14, MotorType.kBrushed);
 
 
-    private PWMSparkMax m_intake = new PWMSparkMax(0);
-    private PWMSparkMax m_index = new PWMSparkMax(1);
+    private PWMSparkMax m_intake = new PWMSparkMax(2);
+    private PWMSparkMax m_index = new PWMSparkMax(3);
 
 
 
@@ -37,6 +39,10 @@ public class IntakeSubsystem extends SubsystemBase {
     //    spark.setIdleMode(idleMode);
     //}
 
+    @Override
+    public void periodic(){
+        updateStatus();
+    }
 
     public void setIntakeSpeed(double speed){
         m_intake.set(speed);
@@ -47,7 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean getIntakeSensor(){
-        return m_intakeSensor.get();
+        return !m_intakeSensor.get();
     }
 
     public boolean getIndexSensor(){
@@ -77,5 +83,10 @@ public class IntakeSubsystem extends SubsystemBase {
             setIndexSpeed(0);
         }
 
+    }
+
+    public void updateStatus() {
+        SmartDashboard.putBoolean("[Intake]: Index Sensor", getIndexSensor());
+        SmartDashboard.putBoolean("[Intake]: Intake Sensor", getIntakeSensor());
     }
 }

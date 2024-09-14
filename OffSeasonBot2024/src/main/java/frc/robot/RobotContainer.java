@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -33,6 +34,7 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandGenericHID coPolotController = new CommandGenericHID(1);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/"));
   private final IntakeSubsystem intake = new IntakeSubsystem();
@@ -53,7 +55,7 @@ public class RobotContainer
     // right stick controls the rotational velocity 
     // buttons are quick rotation positions to different ways to face
     // WARNING: default buttons are on the same buttons as the ones defined in configureBindings
-    AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivebase,
+    /*AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivebase,
                                                                    () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
                                                                                                  OperatorConstants.LEFT_Y_DEADBAND),
                                                                    () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
@@ -63,7 +65,7 @@ public class RobotContainer
                                                                    driverXbox.getHID()::getYButtonPressed,
                                                                    driverXbox.getHID()::getAButtonPressed,
                                                                    driverXbox.getHID()::getXButtonPressed,
-                                                                   driverXbox.getHID()::getBButtonPressed);
+                                                                   driverXbox.getHID()::getBButtonPressed);*/
 
     // Applies deadbands and inverts controls because joysticks
     // are back-right positive while robot
@@ -84,15 +86,15 @@ public class RobotContainer
     Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX() * 0.5);
+        () -> driverXbox.getRightX());
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> driverXbox.getRawAxis(2));
 
-    drivebase.setDefaultCommand(
-        !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    //drivebase.setDefaultCommand(driveFieldOrientedDirectAngle);
   }
 
   /**
@@ -106,46 +108,71 @@ public class RobotContainer
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
     //driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
 
-
-    driverXbox.x().whileTrue(new RunCommand( () -> {
+    coPolotController.button(5).whileTrue(new RunCommand( () -> {
       intake.SensorControl(true, false);
     })).onFalse(new InstantCommand( () -> {
       intake.SensorControl(false, false);
     }));
 
-    driverXbox.a().whileTrue(new InstantCommand( ()-> {
+    coPolotController.axisGreaterThan(3, 0.1).whileTrue(new RunCommand( ()-> {
       intake.SensorControl(false, true);
     })).onFalse(new InstantCommand( () -> {
       intake.SensorControl(false, false);
     }));
 
-    driverXbox.leftBumper().whileTrue(new RunCommand( () -> {
-      intake.setIndexSpeed(1);
-    })).onFalse(new InstantCommand( () -> {
-      intake.setIndexSpeed(0);
+    coPolotController.button(1).onTrue(new InstantCommand( () -> {
+      shooter.setShooterTargetSpeed(1500);
     }));
 
-    driverXbox.rightBumper().onTrue(new InstantCommand( () -> {
-      shooter.setShooterTargetSpeed(4500);
+    coPolotController.button(2).onTrue(new InstantCommand( () -> {
+      shooter.setShooterTargetSpeed(2000);
     }));
 
-    driverXbox.b().onTrue(new InstantCommand(() -> {
+    coPolotController.button(3).onTrue(new InstantCommand( () -> {
+      shooter.setShooterTargetSpeed(3000);
+    }));
+
+    coPolotController.button(4).onTrue(new InstantCommand( () -> {
+      shooter.setShooterTargetSpeed(4000);
+    }));
+
+    coPolotController.button(6).onTrue(new InstantCommand( () -> {
       shooter.setShooterTargetSpeed(0);
     }));
 
-    driverXbox.povUp().whileTrue(new RunCommand(() -> {
-      shooter.setLift(0.2);
+
+    coPolotController.povUp().whileTrue(new RunCommand(() -> {
+      if(shooter.getLiftTop()) {
+        shooter.setLift(0);
+      } else {
+        shooter.setLift(0.3);
+      }
     })).onFalse(new InstantCommand(() -> {
       shooter.setLift(0);
     }));
 
-    driverXbox.povDown().whileTrue(new RunCommand(() -> {
-      shooter.setLift(-0.2);
+    coPolotController.povDown().whileTrue(new RunCommand(() -> {
+
+      if(shooter.getLiftBottom()) {
+        shooter.setLift(0);
+      } else {
+        shooter.setLift(-0.3);
+      }
     })).onFalse(new InstantCommand( () -> {
       shooter.setLift(0);
+    }));
+
+    driverXbox.rightBumper().whileTrue(new RunCommand(() -> {
+      if(shooter.getShooterSetPoint() > 0) {
+        if(shooter.upToSpeed()) {
+          intake.setIndexSpeed(1);
+        }
+      }
+    })).onFalse(new InstantCommand(() -> {
+      intake.setIndexSpeed(0);
     }));
 
 
