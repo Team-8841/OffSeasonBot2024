@@ -148,7 +148,7 @@ public class RobotContainer
       if(shooter.getLiftTop()) {
         shooter.setLift(0);
       } else {
-        shooter.setLift(0.3);
+        shooter.setLift(0.6);
       }
     })).onFalse(new InstantCommand(() -> {
       shooter.setLift(0);
@@ -159,7 +159,7 @@ public class RobotContainer
       if(shooter.getLiftBottom()) {
         shooter.setLift(0);
       } else {
-        shooter.setLift(-0.3);
+        shooter.setLift(-0.6);
       }
     })).onFalse(new InstantCommand( () -> {
       shooter.setLift(0);
@@ -192,7 +192,8 @@ public class RobotContainer
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    //return drivebase.getAutonomousCommand("A2");
+    return null;
   }
 
   public void setDriveMode()

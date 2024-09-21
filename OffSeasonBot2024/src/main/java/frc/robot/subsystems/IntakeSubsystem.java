@@ -1,11 +1,15 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.hal.PowerDistributionJNI;
+
 //import com.revrobotics.CANSparkMax;
 //import com.revrobotics.CANSparkBase.IdleMode;
 //import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,10 +23,10 @@ public class IntakeSubsystem extends SubsystemBase {
     private PWMSparkMax m_intake = new PWMSparkMax(2);
     private PWMSparkMax m_index = new PWMSparkMax(3);
 
-
-
     private DigitalInput m_intakeSensor = new DigitalInput(0);
     private DigitalInput m_indexSensor = new DigitalInput(2);
+
+    private PowerDistribution m_PDH = new PowerDistribution(1, ModuleType.kRev);
 
     public IntakeSubsystem() {
         //configureSparkMax(m_intake, IdleMode.kCoast, 40);
@@ -60,6 +64,10 @@ public class IntakeSubsystem extends SubsystemBase {
         return !m_indexSensor.get();
     }
 
+    public void setLED(boolean on) {
+        m_PDH.setSwitchableChannel(on);
+    }
+
     public void SensorControl(boolean in, boolean out) {
         if (in) {
             if(!getIndexSensor()){
@@ -72,6 +80,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 }
             }
             if (getIndexSensor()){
+                setLED(true);
                 setIndexSpeed(0);
                 setIntakeSpeed(0);
             }
@@ -79,6 +88,7 @@ public class IntakeSubsystem extends SubsystemBase {
             setIntakeSpeed(-0.7);
             setIndexSpeed(-0.7);
         } else {
+            setLED(false);
             setIntakeSpeed(0);
             setIndexSpeed(0);
         }
@@ -87,6 +97,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void updateStatus() {
         SmartDashboard.putBoolean("[Intake]: Index Sensor", getIndexSensor());
-        SmartDashboard.putBoolean("[Intake]: Intake Sensor", getIntakeSensor());
+        SmartDashboard.putBoolean("[Intake]: Intak e Sensor", getIntakeSensor());
     }
 }

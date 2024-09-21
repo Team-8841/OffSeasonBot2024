@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.0,
-      "y": 7.0
+      "x": 0.5318559425323245,
+      "y": 7.201643789032564
     },
     "rotation": 0
   },
@@ -14,7 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "A2P1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "A2P2"
           }
         }
       ]
